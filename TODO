@@ -1,0 +1,4 @@
+- split functionality into gems
+- travis integration
+- rspec
+- yaml config
