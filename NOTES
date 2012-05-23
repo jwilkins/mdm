@@ -1,0 +1,5 @@
+openssl pkcs12 -export -out polyclef_net.pfx -inkey polyclef_net.key -in polyclef_net.crt -certfile PositiveSSLCA2.crt
+
+openssl pkcs12 -in apsp-33d3-full.p12 -out apns-push.pem -nodes -clcerts
+
+

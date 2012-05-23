@@ -1,0 +1,7 @@
+Mobile Device Management (MDM) Server in Ruby
+
+To run:
+
+  bundle install
+
+  rackup
