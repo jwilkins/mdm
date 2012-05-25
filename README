@@ -1,5 +1,7 @@
 Mobile Device Management (MDM) Server in Ruby
 
+http://en.wikipedia.org/wiki/Mobile_device_management
+
 To run:
 
   bundle install

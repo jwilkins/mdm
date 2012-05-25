@@ -1,0 +1,13 @@
+defaults: &defaults
+  applepush:
+    host: gateway.push.apple.com
+    port: 2195
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

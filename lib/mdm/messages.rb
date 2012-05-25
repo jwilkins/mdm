@@ -1,0 +1,3 @@
+module MDM::Messages
+
+end

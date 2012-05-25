@@ -1,10 +1,12 @@
 source :rubygems
 
+gem "rake"
 gem 'sinatra', :require => "sinatra/base"
 gem 'plist'
 gem 'rack'
 gem 'apple-push'
 gem 'uuid'
+gem 'settingslogic'
 
 group :development do
   if RUBY_VERSION =~ /^1.9/
@@ -16,5 +18,5 @@ end
 
 group :test do
   gem "rspec"
-  gem "rake"
+  gem "rack-test"
 end

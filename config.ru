@@ -15,14 +15,15 @@ webrick_options = {
   #:DocumentRoot       => "/ruby/htdocs",
   :SSLEnable          => true,
   :SSLVerifyClient    => OpenSSL::SSL::VERIFY_NONE,
-  :SSLCertificate     => OpenSSL::X509::Certificate.new(  File.open(File.join(CERT_PATH, "ufactory_org.crt")).read),
-  :SSLPrivateKey      => OpenSSL::PKey::RSA.new(          File.open(File.join(CERT_PATH, "ufactory.key")).read),
+  :SSLCertificate     => OpenSSL::X509::Certificate.new(File.open(File.join(CERT_PATH, "ufactory_org.crt")).read),
+  :SSLPrivateKey      => OpenSSL::PKey::RSA.new(File.open(File.join(CERT_PATH, "ufactory.key")).read),
   :SSLCertName        => [ [ "CN", "ufactory.org"] ]
 }
 
 Bundler.require
 
-require "#{File.dirname(__FILE__)}/mdm"
+require "#{File.dirname(__FILE__)}/lib/mdm"
+require "mdm/server"
 
 =begin
 err_log = open("#{File.dirname(__FILE__)}/log/error.log", "a+")
@@ -31,5 +32,5 @@ log = open("#{File.dirname(__FILE__)}/log/server.log", "a+")
 $stdout.reopen(log)
 =end
 
-Rack::Handler::WEBrick.run MDMServer, webrick_options
+Rack::Handler::WEBrick.run MDM::Server, webrick_options
 

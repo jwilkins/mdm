@@ -1,41 +1,29 @@
-# encoding: UTF-8
-#$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-
-require 'rubygems'
-require 'bundler'
-require 'logger'
-require 'yaml'
-require 'ruby-debug'
-Bundler.require
-
-MDM_DIR = File.dirname(__FILE__)
-
-APNS.host = 'gateway.push.apple.com'
-APNS.pem = "#{File.join(MDM_DIR, 'certs', 'apns-push.pem')}"
-
-ApplePush.host = 'gateway.push.apple.com'
-ApplePush.port = 2195
-
-class MDMServer < Sinatra::Base
-
-=begin
+class MDM::Server < Sinatra::Base
   configure :development do
-    LOGGER = Logger.new("#{File.dirname(__FILE__)}/log/development.log")
+    LOGGER = Logger.new("#{MDM_DIR}/log/development.log")
     LOGGER.formatter = proc do |severity, datetime, progname, msg|
-      "#{datetime.strftime("%Y%M%D %h:%m:%s")}:#{progname}:#{severity}: #{msg}\n"
+      "#{datetime.strftime("%Y%m%d %H:%M:%S")}:#{progname}:#{severity}: #{msg}\n"
     end
     enable :logging, :dump_errors
     set :raise_errors, true
   end
 
-  error do
-    e = request.env['sinatra.error']
-    puts "-"*40
-    puts "#{Time.now.strftime("%Y%M%D %h:%m:%s")}\n"
-    puts e.to_s
-    puts e.backtrace.join("\n")
-    puts "-"*40
-    "Application Error!"
+  configure :test do
+    LOGGER = Logger.new("#{MDM_DIR}/log/test.log")
+    LOGGER.formatter = proc do |severity, datetime, progname, msg|
+      "#{datetime.strftime("%Y%m%d %H:%M:%S")}:#{progname}:#{severity}: #{msg}\n"
+    end
+    enable :logging, :dump_errors
+    set :raise_errors, true
+  end
+
+  configure :production do
+    LOGGER = Logger.new("#{MDM_DIR}/log/production.log")
+    LOGGER.formatter = proc do |severity, datetime, progname, msg|
+      "#{datetime.strftime("%Y%m%d %H:%M:%S")}:#{progname}:#{severity}: #{msg}\n"
+    end
+    enable :logging, :dump_errors
+    set :raise_errors, true
   end
 
   helpers do
@@ -43,13 +31,12 @@ class MDMServer < Sinatra::Base
       LOGGER
     end
   end
-=end
 
   def req_plist(request)
     plist = nil
     begin
       body = request.body.read
-      puts body 
+      logger.info body
       plist = Plist.parse_xml(body)
     rescue => e
     end
@@ -61,8 +48,8 @@ class MDMServer < Sinatra::Base
   put '/mdm_checkin' do
     #begin
       plist = req_plist(request)
-      puts "No MessageType, WTF?" unless plist.keys.include?("MessageType")
-      puts "No UDID, WTF?" unless plist.keys.include?("UDID")
+      logger.error "No MessageType, WTF?" unless plist.keys.include?("MessageType")
+      logger.error "No UDID, WTF?" unless plist.keys.include?("UDID")
       dev_file = "#{File.join(MDM_DIR, "devices", plist['UDID'])}.device"
 
       case plist['MessageType']
@@ -95,17 +82,18 @@ class MDMServer < Sinatra::Base
 
       case plist['Status']
       when 'Idle'
-        dev_avail_cap = {
+        dev_response = {
           'Command' => {'RequestType' => 'DeviceInformation', 
-                        'Queries' => ["AvailableDeviceCapacity"]}, 
+                        'Queries' => ["AvailableDeviceCapacity", 
+                                      "OSVersion", "ModelName"]}, 
           'CommandUUID' => UUID.generate
         }.to_plist
 
-        puts dev_avail_cap
-        return dev_avail_cap
+        logger.info dev_response
+        return dev_response
       else
         # XXX log response
-        puts plist
+        logger.info plist
       end
 
     #rescue => e
@@ -117,7 +105,7 @@ class MDMServer < Sinatra::Base
     results = []
     Dir["#{MDM_DIR}/devices/*.device"].each { |dfn|
       begin
-        puts "[d] opening #{dfn}"
+        logger.info "[d] opening #{dfn}"
         dev_info = YAML.load_file(dfn)
         #puts "[d] token: #{dev_info['Token']}"
         #puts "[d] pushmagic: #{dev_info['PushMagic']}"
@@ -133,7 +121,7 @@ class MDMServer < Sinatra::Base
         ApplePush.send_notification(pem, tok, :other => { :mdm => pm })
         results << File.basename(dfn)
       rescue => e
-        puts "[x] error: #{e}"
+        logger.error "[x] error: #{e}"
       end
     }
     "[*] sent notifications to #{results.length} devices (#{results.join(', ')})"

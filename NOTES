@@ -2,4 +2,7 @@ openssl pkcs12 -export -out polyclef_net.pfx -inkey polyclef_net.key -in polycle
 
 openssl pkcs12 -in apsp-33d3-full.p12 -out apns-push.pem -nodes -clcerts
 
+https://github.com/mosen/puppet-osx
+ - can modify cert trust in keychain
 
+curl -kX PUT -D - -d @doc/client_authenticate.plist https://localhost:8443/mdm_checkin
