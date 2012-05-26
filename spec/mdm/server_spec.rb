@@ -20,7 +20,7 @@ describe MDM::Server do
   end
 
   it "handles checkins" do
-    plist = open("#{MDM_DIR}/doc/client_authenticate.plist").read
+    plist = open("#{MDM_DIR}/spec/client_authenticate.plist").read
     put '/mdm_checkin', plist
     last_response.should be_ok
     last_response.body.should =~ /plist/

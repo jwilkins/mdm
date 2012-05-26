@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>MessageType</key>
+        <string>TokenUpdate</string>
+        <key>PushMagic</key>
+        <string>C23EE662-EB73-4871-8342-21652EBAF25C</string>
+        <key>Token</key>
+        <data>
+        77Wo7pbUoKnAbez3paG3ojjhgUGH9/3iux1ZZIJF1l0=
+        </data>
+        <key>Topic</key>
+        <string>com.apple.mgmt.XServer.33d30498-dbde-4f21-9487-a2bca22fb2fa</string>
+        <key>UDID</key>
+        <string>cabe21c0e2365d93c9ca2c0976b2aaeb58ab132e</string>
+</dict>
+</plist>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>MessageType</key>
+        <string>Authenticate</string>
+        <key>Topic</key>
+        <string>com.apple.mgmt.XServer.33d30498-dbde-4f21-9487-a2bca22fb2fa</string>
+        <key>UDID</key>
+        <string>cabe21c0e2365d93c9ca2c0976b2aaeb58ab132e</string>
+</dict>
+</plist>
