@@ -1,3 +1,5 @@
+require 'fileutils'
+
 class MDM::Server < Sinatra::Base
   configure :development do
     LOGGER = Logger.new("#{MDM_DIR}/log/development.log")
@@ -46,11 +48,18 @@ class MDM::Server < Sinatra::Base
 
   #$ curl -kD - -X PUT https://localhost:8443/mdm_checkin
   put '/mdm_checkin' do
-    #begin
+    begin
       plist = req_plist(request)
-      logger.error "No MessageType, WTF?" unless plist.keys.include?("MessageType")
-      logger.error "No UDID, WTF?" unless plist.keys.include?("UDID")
-      dev_file = "#{File.join(MDM_DIR, "devices", plist['UDID'])}.device"
+      unless plist.keys.include?("MessageType")
+        logger.error "No MessageType, WTF?" 
+        halt 404, "No MessageType"
+      end
+
+      unless plist.keys.include?("UDID")
+        logger.error "No UDID, WTF?" 
+        halt 404, "No UDID"
+      end
+
 
       case plist['MessageType']
       when 'Authenticate'
@@ -66,46 +75,44 @@ class MDM::Server < Sinatra::Base
             end
           end
         }
+        dev_file = "#{File.join(MDM_DIR, "devices", plist['UDID'])}.device"
         open(dev_file, 'wb+') { |df| df << dev_info.to_yaml }
         return {}.to_plist
       end
-  #  rescue => e
-  #    puts "checkin error: #{e}"
-  #  end
+    rescue => e
+      logger.error "checkin error: #{e}"
+      halt 404, "Invalid request"
+    end
     {}.to_plist
   end
 
   put '/mdm_server' do
-    #begin
+    begin
       plist = req_plist(request)
-      dev_file = "#{File.join(MDM_DIR, "devices", plist['UDID'])}.device"
+      dev_dir = "#{File.join(MDM_DIR, "devices", plist['UDID'])}"
+      FileUtils.mkdir_p(dev_dir)
 
       # XXX: UDID should have checked in
 
       case plist['Status']
       when 'Idle'
         mm = MDM::Messages.new
-=begin
-        dev_response = mm.messages['DeviceInformation']
-        dev_response['CommandUUID'] = UUID.generate
-        dev_response2 = {
-          'Command' => {'RequestType' => 'DeviceInformation', 
-                        #'Queries' => ["AvailableDeviceCapacity", 
-                        #              "OSVersion", "ModelName"]}, 
-                        'Queries' => mm.messages['DeviceInformation']['Command']['Queries'] },
-          'CommandUUID' => UUID.generate
-        }.to_plist
-
-        logger.info dev_response.to_plist
-        return dev_response.to_plist
-=end
-        return mm.device_information
-      else
+        mm_di = mm.device_information
+        cmd_uuid = mm_di['CommandUUID']
+        # XXX: link CommandUUID to Device UDID
+        # cmd_uuid = plist['UDID']
+        return mm_di.to_plist
+      when 'Acknowledged'
+        di_file = "#{File.join(MDM_DIR, "devices", plist['UDID'], plist['CommandUUID'])}"
+        open(di_file, 'wb+') { |df| df << plist.to_yaml }
+        logger.info plist
+      when 'CommandFormatError'
         logger.info plist
       end
 
-    #rescue => e
-    #end
+    rescue => e
+      halt 404, "Invalid request"
+    end
     {}.to_plist
   end
 
@@ -115,13 +122,6 @@ class MDM::Server < Sinatra::Base
       begin
         logger.info "[d] opening #{dfn}"
         dev_info = YAML.load_file(dfn)
-        #puts "[d] token: #{dev_info['Token']}"
-        #puts "[d] pushmagic: #{dev_info['PushMagic']}"
-        #puts "[d] packaged token: #{}"
-        #nm = APNS::Notification.new(dev_info['Token'],
-        #                            :other => {:mdm=> dev_info['PushMagic']})
-        #puts "[d] #{nm.packaged_notification}"
-        #res = APNS.send_notifications([nm])
         pem = "#{File.join(MDM_DIR, 'certs', 'apns-push.pem')}"
         tok = dev_info['Token']
         pm = dev_info['PushMagic']
