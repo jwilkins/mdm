@@ -8,4 +8,10 @@ class MDM::Messages
       @messages[mm['RequestType']] = {'Command' => mm }
     }
   end
+
+  def device_information
+    msg = @messages['DeviceInformation']
+    msg['CommandUUID'] = UUID.generate
+    msg.to_plist
+  end
 end

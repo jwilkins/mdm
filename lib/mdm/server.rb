@@ -80,22 +80,27 @@ class MDM::Server < Sinatra::Base
       plist = req_plist(request)
       dev_file = "#{File.join(MDM_DIR, "devices", plist['UDID'])}.device"
 
+      # XXX: UDID should have checked in
+
       case plist['Status']
       when 'Idle'
         mm = MDM::Messages.new
-        dev_response = mm['DeviceInformation']
+=begin
+        dev_response = mm.messages['DeviceInformation']
         dev_response['CommandUUID'] = UUID.generate
         dev_response2 = {
           'Command' => {'RequestType' => 'DeviceInformation', 
-                        'Queries' => ["AvailableDeviceCapacity", 
-                                      "OSVersion", "ModelName"]}, 
+                        #'Queries' => ["AvailableDeviceCapacity", 
+                        #              "OSVersion", "ModelName"]}, 
+                        'Queries' => mm.messages['DeviceInformation']['Command']['Queries'] },
           'CommandUUID' => UUID.generate
         }.to_plist
 
-        logger.info dev_response
+        logger.info dev_response.to_plist
         return dev_response.to_plist
+=end
+        return mm.device_information
       else
-        # XXX log response
         logger.info plist
       end
 

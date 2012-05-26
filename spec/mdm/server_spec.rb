@@ -25,4 +25,11 @@ describe MDM::Server do
     last_response.should be_ok
     last_response.body.should =~ /plist/
   end
+
+  it "asks for deviceinformation" do
+    plist = open("#{MDM_DIR}/spec/client_idle.plist").read
+    put '/mdm_server', plist
+    last_response.should be_ok
+    last_response.body.should =~ /plist/
+  end
 end
