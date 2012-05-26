@@ -1,6 +1,6 @@
 source :rubygems
 
-gem "rake"
+gem 'rake'
 gem 'sinatra', :require => "sinatra/base"
 gem 'plist'
 gem 'rack'
@@ -17,6 +17,6 @@ group :development do
 end
 
 group :test do
-  gem "rspec"
-  gem "rack-test"
+  gem 'rspec'
+  gem 'rack-test'
 end
