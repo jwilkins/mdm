@@ -1,6 +1,6 @@
 language: ruby
 bundler_args: --without development
-script: "bundle exec rake spec:ci"
+script: "bundle exec rake spec"
 #before_script:
 # - sudo apt-get update
 # - sudo apt-get install swig
