@@ -1,0 +1,34 @@
+- RequestType: DeviceLock
+
+- RequestType: ProfileList
+
+- RequestType: Restrictions
+
+- RequestType: CertificateList
+
+- RequestType: InstalledApplicationList
+
+- RequestType: ProvisioningProfileList
+
+- RequestType: DeviceInformation
+  Queries: AvailableDeviceCapacity, BluetoothMAC, BuildVersion,
+    CarrierSettingsVersion, CurrentCarrierNetwork,
+    CurrentMCC, CurrentMNC, DataRoamingEnabled,
+    DeviceCapacity, DeviceName, ICCID, IMEI, IsRoaming,
+    Model, ModelName, ModemFirmwareVersion, OSVersion,
+    PhoneNumber, Product, ProductName, SIMCarrierNetwork,
+    SIMMCC, SIMMNC, SerialNumber, UDID, WiFiMAC, UDID
+
+- RequestType: ClearPasscode, UnlockToken
+
+- RequestType: SecurityInfo,
+  Queries: HardwareEncryptionCaps, PasscodePresent,
+   PasscodeCompliant, PasscodeCompliantWithProfiles
+
+- RequestType: InstallProfile
+
+- RequestType: RemoveProfile
+
+- RequestType: InstallProvisioningProfile
+
+- RequestType: RemoveProvisioningProfile

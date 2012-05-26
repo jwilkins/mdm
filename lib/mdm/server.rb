@@ -82,7 +82,10 @@ class MDM::Server < Sinatra::Base
 
       case plist['Status']
       when 'Idle'
-        dev_response = {
+        mm = MDM::Messages.new
+        dev_response = mm['DeviceInformation']
+        dev_response['CommandUUID'] = UUID.generate
+        dev_response2 = {
           'Command' => {'RequestType' => 'DeviceInformation', 
                         'Queries' => ["AvailableDeviceCapacity", 
                                       "OSVersion", "ModelName"]}, 
@@ -90,7 +93,7 @@ class MDM::Server < Sinatra::Base
         }.to_plist
 
         logger.info dev_response
-        return dev_response
+        return dev_response.to_plist
       else
         # XXX log response
         logger.info plist
